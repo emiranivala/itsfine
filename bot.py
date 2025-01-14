@@ -1,6 +1,13 @@
+import logging
 from pyrogram import Client
 from config import API_ID, API_HASH, BOT_TOKEN
-from database.db import db  # Use your MongoDB-based Database class
+from database.db import db
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 class Bot(Client):
     def __init__(self):
@@ -13,12 +20,16 @@ class Bot(Client):
 
     async def start(self):
         await super().start()
-        print("Bot started!")
-        print(f"Total users: {await db.total_users_count()}")  # Example usage of your Database
+        logging.info("Bot started!")
+        try:
+            total_users = await db.total_users_count()
+            logging.info(f"Total users: {total_users}")
+        except Exception as e:
+            logging.error(f"Error accessing database: {e}")
 
     async def stop(self, *args):
         await super().stop()
-        print("Bot stopped.")
+        logging.info("Bot stopped.")
 
 if __name__ == "__main__":
     Bot().run()
